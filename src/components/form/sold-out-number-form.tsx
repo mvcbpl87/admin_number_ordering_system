@@ -104,6 +104,7 @@ export default function SoldOutNumberForm({
                     <FormLabel>Category</FormLabel>
                     <Select
                       onValueChange={field.onChange}
+                      // defaultValue={!field.value ? "" : field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
