@@ -27,6 +27,7 @@ import {
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<UserAuthSchemaType>({
     resolver: zodResolver(UserAuthSchema),
     defaultValues: {
@@ -34,18 +35,21 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       password: "",
     },
   });
-  const isLoading = form.formState.isLoading;
+  // const isLoading = form.formState.isLoading;
 
   async function onSubmit(data: UserAuthSchemaType) {
     try {
+      setIsLoading(true)
       await LoginAction(data);
     } catch (err) {
       console.log("Error from login form", err);
+    }finally{
+      setIsLoading(false);
     }
   }
   return (
     <div className={cn("mx-auto max-w-sm", className)} {...props}>
-      <Card >
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Admin login</CardTitle>
           <CardDescription>

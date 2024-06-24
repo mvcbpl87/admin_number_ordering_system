@@ -9,6 +9,11 @@ declare global {
   type WinningNumbers = Database["public"]["Tables"]["winning_numbers"]["Row"];
   type WinningOrders = Database["public"]["Tables"]["winning_orders"]["Row"];
   type SoldOutNumbers = Database["public"]["Tables"]["sold_out_number"]["Row"];
+  type TicketBought = Database["public"]["Tables"]["ticket_bought"]["Row"];
+  type Commission = Database["public"]["Tables"]["commission"]["Row"];
+  type RootCommission = Database["public"]["Tables"]["root_commission"]["Row"];
+
+  /* ----- Custom Type Exports ----- */
   type WinningNumbersWPrize = {
     id: WinningNumbers["id"];
     number: WinningNumbers["number"];
@@ -40,8 +45,8 @@ declare global {
     Database["public"]["Tables"]["ticket_numbers"]["Row"]
   >;
   type AllSales = CustomerOrders & {
-    ticket_numbers: TicketNumbers |null;
-  } ;
+    ticket_numbers: TicketNumbers | null;
+  };
   type AllSubAccounts = {
     id: Users["id"];
     username: Users["username"];

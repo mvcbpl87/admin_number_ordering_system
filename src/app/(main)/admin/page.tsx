@@ -2,7 +2,9 @@ import { DailyTimeFrame, ISOTimeFormater, WeekTimeFrame } from "@/lib/utils";
 import {
   RetrieveAllSales,
   RetrieveAllUsers,
+  RetrieveRootCommission,
   currentUser,
+  currentUserRoleTier,
 } from "@/server-actions";
 
 import {
@@ -12,6 +14,8 @@ import {
 } from "@tabler/icons-react";
 import SalesTable from "./components/sales-table";
 import { CardSales } from "./components/sales-card";
+import { RoleTypeObj } from "@/lib/types";
+import CommissionCard from "./components/sales-commission-card";
 
 export default async function Home() {
   let monthlySales = 0;
@@ -21,6 +25,8 @@ export default async function Home() {
   const user = await currentUser();
   const allSales = await RetrieveAllSales();
   const allUsers = await RetrieveAllUsers(user.id);
+  const credentials = await currentUserRoleTier(user.id);
+  const root_commission = await RetrieveRootCommission();
 
   if (allSales) {
     monthlySales = allSales?.reduce((accumulator, current) => {
@@ -92,12 +98,15 @@ export default async function Home() {
               : allUsers.filter((item) => item.role !== "Dev").length
           }
           descriptions={`Currently active admin +${
-            allUsers && allUsers.filter((user) => user.role === "Admin").length
+            allUsers && allUsers.filter((user) => user.role === RoleTypeObj.Admin).length
           } and agent +${
-            allUsers && allUsers.filter((user) => user.role === "Agent").length
+            allUsers && allUsers.filter((user) => user.role === RoleTypeObj.Agent).length
           }`}
         />
       </div>
+      {
+        credentials?.role === RoleTypeObj.Owner && <CommissionCard commission_value={root_commission}/>
+      }
       <SalesTable
         users={allUsers ? allUsers.filter((item) => item.role !== "Dev") : []}
         sales={allSales!}

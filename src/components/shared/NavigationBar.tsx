@@ -9,7 +9,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 function NavLinks() {
   const currentPath = usePathname();
-  // console.log(currentPath)
   return (
     <nav className="flex flex-col gap-2 px-1 ">
       {NavLinksList.map((navlink) => {

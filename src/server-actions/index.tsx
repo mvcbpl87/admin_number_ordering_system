@@ -32,7 +32,7 @@ export async function currentUserRoleTier(user_id: string) {
       .eq("id", user_id)
       .single();
 
-    if (error) throw new Error("Something wrong when fetching credentials");
+    if (error) throw new Error(error.message);
     return data;
   } catch (error) {
     console.log(error);
@@ -49,7 +49,7 @@ export async function currentUserCredentials(user_id: string) {
       .eq("id", user_id)
       .single();
 
-    if (error) throw new Error("Something wrong when fetching credentials");
+    if (error) throw new Error(error.message);
     return data;
   } catch (error) {
     console.log(error);
@@ -96,7 +96,7 @@ export async function RetrieveAllUsers(user_id: string) {
       .from("users")
       .select("*")
       .neq("id", user_id);
-    if (error) throw new Error();
+    if (error) throw new Error(error.message);
 
     return data;
   } catch (err) {
@@ -104,6 +104,22 @@ export async function RetrieveAllUsers(user_id: string) {
   }
 }
 
+/* --- Read Commission percent (root)(!Im: HQ Specified) ---- */
+export async function RetrieveRootCommission() {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("root_commission")
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+/* --- Read All Ticket Orders (all sales) for within a current month --- */
 export async function RetrieveAllSales() {
   try {
     const currDate = new Date();
@@ -114,6 +130,22 @@ export async function RetrieveAllSales() {
       .select("*, ticket_numbers(*)")
       .gte("created_at", startOfMonth(currDate))
       .lte("created_at", endOfMonth(currDate));
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+/* --- Read Target Sales for selected category and draw_date --- */
+export async function RetrieveTargetSales(category: string, draw_date: string) {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("ticket_numbers")
+      .select()
+      .contains("category", [category])
+      .eq("draw_date", draw_date);
     if (error) throw new Error(error.message);
     return data;
   } catch (err) {
@@ -372,6 +404,20 @@ export async function ManageSoldOutNumber(values: SoldOutNumberSchemaType) {
   }
 }
 
+export async function UpsertRootCommission(values: RootCommission) {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("root_commission")
+      .upsert(values)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
 /** Update User Credentials */
 export async function UpdateUserAccountAction(
   user_id: string,

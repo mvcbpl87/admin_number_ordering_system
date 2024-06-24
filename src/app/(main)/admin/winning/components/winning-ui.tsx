@@ -1,12 +1,7 @@
 "use client";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CategoryList } from "@/lib/types";
-import { cn, formatDate } from "@/lib/utils";
-import { IconTrophy } from "@tabler/icons-react";
-import Image from "next/image";
 import { useState } from "react";
 import WinningTable from "./winning-table";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,

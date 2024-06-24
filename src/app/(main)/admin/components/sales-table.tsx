@@ -1,8 +1,11 @@
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-
+"use client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import React from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Card,
   CardContent,
@@ -21,6 +24,7 @@ import {
 import { IconConfetti } from "@tabler/icons-react";
 import { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 
 interface SalesTableProps extends HTMLAttributes<HTMLDivElement> {
   users: Users[] | [];
@@ -43,7 +47,7 @@ export default function SalesTable({
         return (accumulator += pivot);
       }, 0);
     }
-    return totalSales
+    return totalSales;
   };
   return (
     <Card className={cn("xl:col-span-2", className)}>
@@ -62,6 +66,7 @@ export default function SalesTable({
             <TableRow>
               <TableHead className=" ">Users</TableHead>
               <TableHead className="text-center">Role</TableHead>
+              <TableHead className="text-center">Commision</TableHead>
               <TableHead className="text-right">Total Sales</TableHead>
             </TableRow>
           </TableHeader>
@@ -73,32 +78,111 @@ export default function SalesTable({
                 </TableCell>
               </TableRow>
             ) : (
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="w-[70%]">
-                    <div className="font-medium">{user.username}</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      {user.email}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-2 ">
-                      <span>{user.role}</span>
-                      <Badge
-                        className="text-xs text-muted-foreground"
-                        variant="secondary"
-                      >
-                        {`Tier-${user.tier}`}
-                      </Badge>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">RM{calculateTotalSales(user.id).toFixed(2)}</TableCell>
-                </TableRow>
-              ))
+              users
+                .filter((user_tier) => user_tier.tier === "1")
+                .map((user) => (
+                  <Collapsible key={user.id} asChild>
+                    <>
+                      <CollapsibleTrigger asChild>
+                        <TableRow>
+                          <TableCell className="w-[70%]">
+                            <div className="font-medium">{user.username}</div>
+                            <div className="hidden text-sm text-muted-foreground md:inline">
+                              {user.email}
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="flex flex-col items-center justify-center gap-2 ">
+                              <span>{user.role}</span>
+                              <Badge
+                                className="text-xs text-muted-foreground"
+                                variant="secondary"
+                              >
+                                {`Tier-${user.tier}`}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">RM0</TableCell>
+                          <TableCell className="text-right">
+                            RM{calculateTotalSales(user.id).toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent asChild>
+                        <>
+                          {/* <div className="bg-red">
+                            <h2 className="mb-2 md:mb-4">Downline</h2>
+                          </div> */}
+                          {/* <tr aria-expanded={true}  aria-controls = "radix-:r3" className="bg-red-200 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                              test
+                          </tr> */}
+                          <DownlineSalesTable
+                            parent_id={user.id}
+                            users={users}
+                            calculateTotalSales={calculateTotalSales}
+                          />
+                        </>
+                      </CollapsibleContent>
+                    </>
+                  </Collapsible>
+                ))
             )}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
+  );
+}
+
+interface DownlineSalesTableProps {
+  parent_id: string;
+  users: Users[] | [];
+  calculateTotalSales: (user_id: string) => number;
+}
+function DownlineSalesTable({
+  parent_id,
+  users,
+  calculateTotalSales,
+}: DownlineSalesTableProps) {
+  return (
+    <>
+      <TableRow className="">
+        <TableCell colSpan={4} className=" p-2  ">
+          <div className="flex items-center gap-2">
+          <ChevronDown size={15}/>
+          <h2 className="">Downline</h2>
+            </div>
+        
+        </TableCell>
+      </TableRow>
+      {users
+        .filter((item) => item.refer_to === parent_id)
+        .map((user) => (
+          <TableRow className=" bg-muted-foreground/10 hover:bg-muted-foreground/10">
+            <TableCell className="w-[70%]">
+              <div className="font-medium">{user.username}</div>
+              <div className="hidden text-sm text-muted-foreground md:inline">
+                {user.email}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col items-center justify-center gap-2 ">
+                <span>{user.role}</span>
+                <Badge
+                  className="text-xs text-muted-foreground"
+                  variant="secondary"
+                >
+                  {`Tier-${user.tier}`}
+                </Badge>
+              </div>
+            </TableCell>
+            <TableCell className="text-center">RM0</TableCell>
+            <TableCell className="text-right">
+              RM{calculateTotalSales(user.id).toFixed(2)}
+            </TableCell>
+          </TableRow>
+        ))}
+    </>
   );
 }

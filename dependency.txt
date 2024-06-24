@@ -1,0 +1,8 @@
+access_token = sbp_3c92b204cd688f3899b0c6763c60aa493dcc5d88
+
+## command to generate supabase typescript with supabase cli
+npx supabase gen types typescript --project-id [project_id] > schema/database.types.ts
+
+
+
+npx supabase gen types typescript --project-id hmpqoouologdjxhgdncb > schema/database.types.ts

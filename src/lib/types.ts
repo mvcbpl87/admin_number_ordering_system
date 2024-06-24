@@ -53,6 +53,12 @@ export const SoldOutNumberSchema = z.object({
   category: z.string().min(1, { message: "Required shop category" }),
 });
 
+export const BuyNumberSchema = z.object({
+  number: z.string().min(1, { message: "Required number" }),
+  total_big: z.number().min(1, { message: "Required amount to buy big" }),
+  total_small: z.number().min(1, { message: "Required amount to buy small" }),
+});
+
 export const UserProfileSchema = z.object({
   username: z
     .string()
@@ -87,11 +93,19 @@ export type ManageUserAccountSchemaType = z.infer<
   typeof ManageUserAccountSchema
 >;
 export type SoldOutNumberSchemaType = z.infer<typeof SoldOutNumberSchema>;
+export type BuyNumberSchemaType = z.infer<typeof BuyNumberSchema>;
 export type TierType = "1" | "2" | "3";
 export type RoleType = "Owner" | "Admin" | "Agent";
+type RoleTypeObjType = {
+  [key in RoleType]: String;
+};
 export const TierTypeList: TierType[] = ["1", "2", "3"];
 export const RoleTypeList: RoleType[] = ["Owner", "Admin", "Agent"];
-
+export const RoleTypeObj: RoleTypeObjType = {
+  Owner: "Owner",
+  Admin: "Admin",
+  Agent: "Agent",
+};
 export type UserAccountColumnType = {
   id: string;
   email: string | null;
