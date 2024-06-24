@@ -159,7 +159,7 @@ function DownlineSalesTable({
       {users
         .filter((item) => item.refer_to === parent_id)
         .map((user) => (
-          <TableRow className=" bg-muted-foreground/10 hover:bg-muted-foreground/10">
+          <TableRow key ={`dw-${user.id}`} className=" bg-muted-foreground/10 hover:bg-muted-foreground/10">
             <TableCell className="w-[70%]">
               <div className="font-medium">{user.username}</div>
               <div className="hidden text-sm text-muted-foreground md:inline">
