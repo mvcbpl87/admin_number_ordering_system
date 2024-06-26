@@ -30,6 +30,7 @@ export const CreateUserAccountSchema = z.object({
     .min(7, {
       message: "Password must be at least 7 characters long",
     }),
+    percent: z.number({ required_error: "Required commission rate" }),
 });
 
 export const ManageUserAccountSchema = z.object({
@@ -41,6 +42,7 @@ export const ManageUserAccountSchema = z.object({
   role: z.string(),
   tier: z.string(),
   password: z.string(),
+  percent: z.number({ required_error: "Required commission rate" }),
 });
 
 export const SoldOutNumberSchema = z.object({
@@ -106,13 +108,14 @@ export const RoleTypeObj: RoleTypeObjType = {
   Admin: "Admin",
   Agent: "Agent",
 };
-export type UserAccountColumnType = {
-  id: string;
-  email: string | null;
-  username: string | null;
-  role: string | null;
-  tier: string;
-};
+// export type UserAccountColumnType = {
+//   id: string;
+//   email: string | null;
+//   username: string | null;
+//   role: string | null;
+//   tier: string;
+// };
+export type UserAccountColumnType = UsersWCommission
 
 export type shopType =
   | "Damacai"

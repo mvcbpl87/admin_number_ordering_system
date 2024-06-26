@@ -26,6 +26,7 @@ import {
   CreateUserAccountSchema,
   CreateUserAccountSchemaType,
   RoleTypeList,
+  RoleTypeObj,
   TierTypeList,
 } from "@/lib/types";
 import { CreateUserAccountAction } from "@/server-actions";
@@ -33,12 +34,14 @@ import { CreateUserAccountAction } from "@/server-actions";
 interface CreateUserAccountFormProps extends HTMLAttributes<HTMLDivElement> {
   user_id: string;
   role: string;
+  commRate:number;
 }
 
 export function CreateUserAccountForm({
   className,
   role,
   user_id,
+  commRate,
   ...props
 }: CreateUserAccountFormProps) {
   const { toast } = useToast();
@@ -49,6 +52,7 @@ export function CreateUserAccountForm({
     parent: user_id,
     role: "Agent",
     tier: "1",
+    percent: commRate
   };
   const form = useForm<CreateUserAccountSchemaType>({
     resolver: zodResolver(CreateUserAccountSchema),
@@ -159,6 +163,29 @@ export function CreateUserAccountForm({
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g 0123456789" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="percent"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Commission rate (%)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="20%"
+                        value={field.value}
+                        onChange={(e) => {
+                          if (!isNaN(Number(e.target.value))) {
+                            field.onChange(Number(e.target.value));
+                          }
+                        }}
+                        type="number"
+                        readOnly = {role !== RoleTypeObj.Owner}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

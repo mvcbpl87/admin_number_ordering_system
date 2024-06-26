@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 
 interface SalesTableProps extends HTMLAttributes<HTMLDivElement> {
-  users: Users[] | [];
+  users: UsersWCommission[] | [];
   sales: AllSales[] | [];
 }
 
@@ -84,7 +84,7 @@ export default function SalesTable({
                   <Collapsible key={user.id} asChild>
                     <>
                       <CollapsibleTrigger asChild>
-                        <TableRow>
+                        <TableRow className="ml-20">
                           <TableCell className="w-[70%]">
                             <div className="font-medium">{user.username}</div>
                             <div className="hidden text-sm text-muted-foreground md:inline">
@@ -103,7 +103,16 @@ export default function SalesTable({
                               </Badge>
                             </div>
                           </TableCell>
-                          <TableCell className="text-center">RM0</TableCell>
+                          <TableCell className="text-center">
+                            RM
+                            {user.commission
+                              ? (
+                                  (calculateTotalSales(user.id) *
+                                    user.commission?.percent!) /
+                                  100
+                                ).toFixed(2)
+                              : 0}
+                          </TableCell>
                           <TableCell className="text-right">
                             RM{calculateTotalSales(user.id).toFixed(2)}
                           </TableCell>
@@ -111,12 +120,6 @@ export default function SalesTable({
                       </CollapsibleTrigger>
                       <CollapsibleContent asChild>
                         <>
-                          {/* <div className="bg-red">
-                            <h2 className="mb-2 md:mb-4">Downline</h2>
-                          </div> */}
-                          {/* <tr aria-expanded={true}  aria-controls = "radix-:r3" className="bg-red-200 border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                              test
-                          </tr> */}
                           <DownlineSalesTable
                             parent_id={user.id}
                             users={users}
@@ -137,7 +140,7 @@ export default function SalesTable({
 
 interface DownlineSalesTableProps {
   parent_id: string;
-  users: Users[] | [];
+  users: UsersWCommission[] | [];
   calculateTotalSales: (user_id: string) => number;
 }
 function DownlineSalesTable({
@@ -150,16 +153,15 @@ function DownlineSalesTable({
       <TableRow className="">
         <TableCell colSpan={4} className=" p-2  ">
           <div className="flex items-center gap-2">
-          <ChevronDown size={15}/>
-          <h2 className="">Downline</h2>
-            </div>
-        
+            <ChevronDown size={15} />
+            <h2 className="">Downline</h2>
+          </div>
         </TableCell>
       </TableRow>
       {users
         .filter((item) => item.refer_to === parent_id)
         .map((user) => (
-          <TableRow key ={`dw-${user.id}`} className=" bg-muted-foreground/10 hover:bg-muted-foreground/10">
+          <TableRow key={`dw-${user.id}`}>
             <TableCell className="w-[70%]">
               <div className="font-medium">{user.username}</div>
               <div className="hidden text-sm text-muted-foreground md:inline">
@@ -177,9 +179,74 @@ function DownlineSalesTable({
                 </Badge>
               </div>
             </TableCell>
-            <TableCell className="text-center">RM0</TableCell>
+            <TableCell className="text-center">
+              RM
+              {user.commission
+                ? (
+                    (calculateTotalSales(user.id) * user.commission?.percent!) /
+                    100
+                  ).toFixed(2)
+                : 0}
+            </TableCell>
             <TableCell className="text-right">
               RM{calculateTotalSales(user.id).toFixed(2)}
+            </TableCell>
+          </TableRow>
+        ))}
+    </>
+  );
+}
+
+function DownlineSalesTable2({
+  parent_id,
+  users,
+  calculateTotalSales,
+}: DownlineSalesTableProps) {
+  return (
+    <>
+      <TableRow className="">
+        <TableCell colSpan={4} className=" p-2  ">
+          <div className="flex items-center gap-2">
+            <ChevronDown size={15} />
+            <h2 className="">Downline</h2>
+          </div>
+        </TableCell>
+      </TableRow>
+      {users
+        .filter((item) => item.refer_to === parent_id)
+        .map((user) => (
+          <TableRow key={`dw-${user.id}`}>
+            <TableCell colSpan={4}>
+              <div className="table-cell">
+                <div className="font-medium">{user.username}</div>
+                <div className="hidden text-sm text-muted-foreground md:inline">
+                  {user.email}
+                </div>
+              </div>
+              <div>
+                <div className="flex flex-col items-center justify-center gap-2 ">
+                  <span>{user.role}</span>
+                  <Badge
+                    className="text-xs text-muted-foreground"
+                    variant="secondary"
+                  >
+                    {`Tier-${user.tier}`}
+                  </Badge>
+                </div>
+              </div>
+              <div className="text-center">
+                RM
+                {user.commission
+                  ? (
+                      (calculateTotalSales(user.id) *
+                        user.commission?.percent!) /
+                      100
+                    ).toFixed(2)
+                  : 0}
+              </div>
+              <div className="text-right">
+              RM{calculateTotalSales(user.id).toFixed(2)}
+              </div>
             </TableCell>
           </TableRow>
         ))}

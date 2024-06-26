@@ -14,6 +14,7 @@ declare global {
   type RootCommission = Database["public"]["Tables"]["root_commission"]["Row"];
 
   /* ----- Custom Type Exports ----- */
+  type UsersWCommission = Users & { commission: Commission | null };
   type WinningNumbersWPrize = {
     id: WinningNumbers["id"];
     number: WinningNumbers["number"];

@@ -1,6 +1,4 @@
-import Image from "next/image";
-import { Loader2, MoreHorizontal } from "lucide-react";
-
+import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,33 +43,6 @@ import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { DeleteSoldOutNumbers, RetrieveSoldOutNumbers } from "@/server-actions";
 import { formatDate } from "@/lib/utils";
 import SoldOutNumberForm from "@/components/form/sold-out-number-form";
-
-const Data = [
-  {
-    number: 1578,
-    gametype: "Big",
-    drawDate: "June 5, 2024",
-    boxbet: "B24",
-    totalUnit: 24,
-    category: "Damacai",
-  },
-  {
-    number: 8584,
-    gametype: "Big",
-    drawDate: "June 5, 2024",
-    boxbet: "B12",
-    totalUnit: 12,
-    category: "Damacai",
-  },
-  {
-    number: 6897,
-    gametype: "Big",
-    drawDate: "June 5, 2024",
-    boxbet: "none",
-    totalUnit: 1,
-    category: "Damacai",
-  },
-];
 
 interface SoldOutTableProps {
   category: string | null;

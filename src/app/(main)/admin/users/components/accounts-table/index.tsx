@@ -33,14 +33,16 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   user_id: string;
   role: string;
-  tier: string
+  commRate: number;
+  tier: string;
 }
 export default function UsersAccountsDataTable<TData, TValue>({
   columns,
   data,
   user_id,
   role,
-  tier
+  tier,
+  commRate,
 }: DataTableProps<TData, TValue>) {
   const modal = useModal();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -51,8 +53,12 @@ export default function UsersAccountsDataTable<TData, TValue>({
         subheading="Create new agent or admin account. Please provide all credentials below."
       >
         <Separator className="my-10 " />
-        <CreateUserAccountForm user_id={user_id} role={role} className="pt-2"/>
-        {/* <CreateSubAccountForm user_id={user_id} role={role} tier={tier} /> */}
+        <CreateUserAccountForm
+          user_id={user_id}
+          role={role}
+          commRate={commRate}
+          className="pt-2"
+        />
       </CustomModal>
     );
   };
@@ -68,7 +74,9 @@ export default function UsersAccountsDataTable<TData, TValue>({
       <div className="flex items-center justify-between py-4 ">
         <Input
           placeholder="Search user accounts..."
-          value={(table.getColumn("username")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("username")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             table.getColumn("username")?.setFilterValue(event.target.value)
           }

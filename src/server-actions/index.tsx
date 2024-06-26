@@ -45,7 +45,7 @@ export async function currentUserCredentials(user_id: string) {
     const supabase = createClient();
     const { error, data } = await supabase
       .from("users")
-      .select("*")
+      .select("*, commission(*)")
       .eq("id", user_id)
       .single();
 
@@ -94,7 +94,7 @@ export async function RetrieveAllUsers(user_id: string) {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("users")
-      .select("*")
+      .select("*, commission(*)")
       .neq("id", user_id);
     if (error) throw new Error(error.message);
 
@@ -345,27 +345,40 @@ export async function CreateUserAccountAction(
 ) {
   try {
     const supabase = createSupabaseAdmin();
-    const { error } = await (
+    const { data, error } = await (
       await supabase
     ).auth.admin.createUser({
       email: values.email,
       password: values.password,
+      email_confirm: true,
       user_metadata: {
         username: values.username,
         email: values.email,
         role: values.role,
         parent: values.parent,
-        tier: `${Number(values.tier) + 1}`,
+        tier: `${Number(values.tier)}`,
       },
     });
-    if (error) throw new Error();
+    if (error) throw new Error(error.message);
+    if (data) await UpsertUserCommission(data.user.id, values.percent);
 
     return revalidatePath(path.users);
   } catch (err) {
     console.log(err);
   }
 }
-
+export async function UpsertUserCommission(user_id: string, percent: number) {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("commission")
+      .upsert({ id: user_id, percent })
+      .select();
+    if (error) throw new Error(error.message);
+  } catch (err) {
+    console.log(err);
+  }
+}
 /* --- Create Sold Out Number --- */
 export async function ManageSoldOutNumber(values: SoldOutNumberSchemaType) {
   let permutations: Number[] = [];
@@ -453,7 +466,8 @@ export async function UpdateUserAccountAction(
           tier: metadata.tier,
         })
         .eq("id", user_id);
-      if (error) throw new Error();
+      if (error) throw new Error(error.message);
+      await UpsertUserCommission(data.user.id, values.percent);
     }
     return revalidatePath(path.users);
   } catch (err) {

@@ -28,6 +28,7 @@ import {
   ManageUserAccountSchema,
   ManageUserAccountSchemaType,
   RoleTypeList,
+  RoleTypeObj,
   TierTypeList,
   UserAccountColumnType,
 } from "@/lib/types";
@@ -51,6 +52,7 @@ export function ManageUserAccountForm({
     role: !credentials.role ? "" : credentials.role,
     tier: !credentials.tier ? "1" : credentials.tier,
     password: "",
+    percent: !credentials ? 0 : credentials.commission?.percent,
   };
   const form = useForm<ManageUserAccountSchemaType>({
     resolver: zodResolver(ManageUserAccountSchema),
@@ -189,7 +191,29 @@ export function ManageUserAccountForm({
                 )}
               />
             </div>
-
+            <FormField
+              control={form.control}
+              name="percent"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Commission rate (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="20%"
+                      value={field.value}
+                      onChange={(e) => {
+                        if (!isNaN(Number(e.target.value))) {
+                          field.onChange(Number(e.target.value));
+                        }
+                      }}
+                      type="number"
+                      readOnly = {credentials.role !== RoleTypeObj.Owner}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="w-full" loading={isLoading}>
               Save credentials
             </Button>
