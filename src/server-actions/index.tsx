@@ -272,6 +272,7 @@ export async function RetrieveWinningOrders(
           number: won_num.number.filter((number) =>
             order.number.includes(number)
           ),
+          gametype,
           draw_date: won_num.draw_date,
           category: won_num.category,
         }));
