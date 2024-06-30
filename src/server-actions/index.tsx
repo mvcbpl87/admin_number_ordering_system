@@ -245,7 +245,7 @@ export async function RetrieveWinningOrders(
     const { data, error } = await supabase
       .from("winning_orders")
       .select(
-        "number, draw_date, gametype, category, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
+        "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
       )
       .eq("draw_date", draw_date)
       .eq("gametype", gametype)
@@ -332,7 +332,7 @@ export async function CreateWinningOrders(values: any) {
       .from("winning_orders")
       .upsert(values)
       .select(
-        "number, draw_date, gametype, category, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
+        "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
       );
     if (error) throw new Error(error.message);
     return data;
@@ -376,6 +376,32 @@ export async function UpsertUserCommission(user_id: string, percent: number) {
       .upsert({ id: user_id, percent })
       .select();
     if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
+  let temp : WinningOrders= {
+    customer_id: values.customer_id,
+    prize_id: values.prize_id,
+    number: values.number,
+    draw_date: values.draw_date,
+    gametype: values.gametype,
+    category: values.category,
+    claimed : !values.claimed
+  };
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("winning_orders")
+      .upsert(temp)
+      .select(
+        "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
+      );
+      if (error) throw new Error(error.message);
+      return data;
   } catch (err) {
     console.log(err);
   }

@@ -89,6 +89,8 @@ export default function WinningNumber({
     e: React.ChangeEvent<HTMLInputElement>,
     item: WinningNumbersWPrize
   ) => {
+    if (Array.from(e.target.value).length > 4) return;
+    if (Number(e.target.value) < -1) return;
     if (!isNaN(Number(e.target.value))) {
       setItems((prev) => {
         const existingItems = [...prev];
@@ -109,6 +111,8 @@ export default function WinningNumber({
     numIndex: number,
     item: WinningNumbersWPrize
   ) => {
+    if (Array.from(e.target.value).length > 4) return;
+    if (Number(e.target.value) < -1) return;
     if (!isNaN(Number(e.target.value))) {
       setItems((prev) => {
         const existingItems = [...prev];
@@ -167,7 +171,7 @@ export default function WinningNumber({
               size="sm"
               className="ml-auto gap-1 flex items-center"
               onClick={() => setIsEdit(!isEdit)}
-              disabled = {!category || !gametype || !drawDate}
+              disabled={!category || !gametype || !drawDate}
             >
               <span>Set Winning Number</span>
               <ArrowUpRight className="h-4 w-4" />

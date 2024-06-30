@@ -1,8 +1,17 @@
-import Image from "next/image";
 import { Loader2, MoreHorizontal } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogContent,
+} from "@/components/ui/alert-dialog";
 import {
   Card,
   CardContent,
@@ -28,31 +37,9 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { RetrieveWinningOrders } from "@/server-actions";
+import { RetrieveWinningOrders, UpsertWinningClaim } from "@/server-actions";
 import { formatDate } from "@/lib/utils";
-const Data = [
-  {
-    number: 4321,
-    gametype: "Big",
-    drawDate: "June 5, 2024",
-    prizeType: "First",
-    prizeValue: 2400,
-  },
-  {
-    number: 8584,
-    gametype: "Big",
-    drawDate: "June 5, 2024",
-    prizeType: "Third",
-    prizeValue: 1500,
-  },
-  {
-    number: 6897,
-    gametype: "Big",
-    drawDate: "June 5, 2024",
-    prizeType: "Second",
-    prizeValue: 1800,
-  },
-];
+import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
 interface WinningTableProps {
   category: string | null;
@@ -80,8 +67,6 @@ export default function WinningTable({
         gametype,
         formatDate(drawDate)
       );
-
-      console.log(winning_orders);
       if (winning_orders) setData(winning_orders);
     } catch (error) {
       toast({
@@ -125,7 +110,9 @@ export default function WinningTable({
               <TableHead>contacts</TableHead>
               <TableHead>agent</TableHead>
               <TableHead>prize type</TableHead>
+              <TableHead>status</TableHead>
               <TableHead className="text-end">prize winning</TableHead>
+              <TableHead className="sr-only table-cell">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -154,8 +141,14 @@ export default function WinningTable({
                     </div>
                   </TableCell>
                   <TableCell>{data.prizes?.prize_type}</TableCell>
+                  <TableCell>{data.claimed ? "claimed" : "pending"}</TableCell>
                   <TableCell className="text-end font-medium">
-                    RM {data.prizes?.prize_value && (data.prizes.prize_value * data.number.length).toFixed(2)}
+                    RM{" "}
+                    {data.prizes?.prize_value &&
+                      (data.prizes.prize_value * data.number.length).toFixed(2)}
+                  </TableCell>
+                  <TableCell>
+                    <ActionDropdown data={data} setData={setData} />
                   </TableCell>
                 </TableRow>
               ))
@@ -170,5 +163,67 @@ export default function WinningTable({
         </Table>
       </CardContent>
     </Card>
+  );
+}
+
+function ActionDropdown({
+  data,
+  setData,
+}: {
+  data: WinningOrdersWCredentials;
+  setData: React.Dispatch<React.SetStateAction<WinningOrdersWCredentials[]>>;
+}) {
+  const { toast } = useToast();
+  const handleClaim = async () => {
+    try {
+      const update_data = await UpsertWinningClaim(data);
+      if (update_data)
+        setData((prev) => {
+          var exisitingItems = [...prev];
+          var ItemIndex = exisitingItems.findIndex(
+            (currItem) =>
+              currItem.customer_id === update_data[0].customer_id &&
+              currItem.prize_id === update_data[0].prize_id
+          );
+          exisitingItems[ItemIndex] = update_data[0];
+          return exisitingItems;
+        });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: `${error}`,
+      });
+    }
+  };
+  return (
+    <AlertDialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button aria-haspopup="true" size="icon" variant="ghost">
+            <DotsVerticalIcon className="h-4 w-4" />
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <AlertDialogTrigger>Claim</AlertDialogTrigger>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you wish to continue claim this ticket?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleClaim}>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -118,7 +118,7 @@ export function CreateUserAccountForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tier</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} disabled>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue

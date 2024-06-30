@@ -25,6 +25,7 @@ import { IconConfetti } from "@tabler/icons-react";
 import { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
+import { RoleTypeObj } from "@/lib/types";
 
 interface SalesTableProps extends HTMLAttributes<HTMLDivElement> {
   users: UsersWCommission[] | [];
@@ -99,7 +100,9 @@ export default function SalesTable({
                                 className="text-xs text-muted-foreground"
                                 variant="secondary"
                               >
-                                {`Tier-${user.tier}`}
+                                {user.role === RoleTypeObj.Admin
+                                  ? `none`
+                                  : `Tier-${user.tier}`}
                               </Badge>
                             </div>
                           </TableCell>
@@ -175,7 +178,9 @@ function DownlineSalesTable({
                   className="text-xs text-muted-foreground"
                   variant="secondary"
                 >
-                  {`Tier-${user.tier}`}
+                  {user.role === RoleTypeObj.Admin
+                    ? `none`
+                    : `Tier-${user.tier}`}
                 </Badge>
               </div>
             </TableCell>
@@ -245,7 +250,7 @@ function DownlineSalesTable2({
                   : 0}
               </div>
               <div className="text-right">
-              RM{calculateTotalSales(user.id).toFixed(2)}
+                RM{calculateTotalSales(user.id).toFixed(2)}
               </div>
             </TableCell>
           </TableRow>

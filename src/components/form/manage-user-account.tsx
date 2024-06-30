@@ -90,7 +90,7 @@ export function ManageUserAccountForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} disabled>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue
@@ -120,7 +120,7 @@ export function ManageUserAccountForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tier</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} disabled>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue
@@ -208,6 +208,7 @@ export function ManageUserAccountForm({
                       }}
                       type="number"
                       readOnly = {credentials.role !== RoleTypeObj.Owner}
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />

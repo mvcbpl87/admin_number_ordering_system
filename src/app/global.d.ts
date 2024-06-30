@@ -23,11 +23,7 @@ declare global {
     category: WinningNumbers["category"];
     prizes: Prizes;
   };
-  type WinningOrdersWCredentials = {
-    number: WinningOrders["number"];
-    draw_date: WinningOrders["draw_date"];
-    gametype: WinningOrders["gametype"];
-    category: WinningOrders["category"];
+  type WinningOrdersWCredentials = WinningOrders & {
     customer_orders: {
       id: CustomerOrders["id"];
       phone_number: CustomerOrders["phone_number"];
@@ -41,7 +37,6 @@ declare global {
       prize_value: Prizes["prize_value"];
     } | null;
   };
-
   type NewTicketNumbers = Partial<
     Database["public"]["Tables"]["ticket_numbers"]["Row"]
   >;

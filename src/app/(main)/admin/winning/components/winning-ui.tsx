@@ -17,7 +17,6 @@ export default function WinningUI() {
   const [winningNumbers, setWinningNumbers] = useState<WinningNumbersWPrize[]>(
     []
   );
-  // const [items, setItems] = useState<WinningNumbersWPrize[]>([]);
   const [currCategory, setCurrCategory] = useState<string | null>(null);
   const [gametype, setGametype] = useState<string | null>(null);
   const [date, setDate] = useState<Date>();

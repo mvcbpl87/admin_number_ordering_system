@@ -98,17 +98,25 @@ export default async function Home() {
               : allUsers.filter((item) => item.role !== "Dev").length
           }
           descriptions={`Currently active admin +${
-            allUsers && allUsers.filter((user) => user.role === RoleTypeObj.Admin).length
+            allUsers &&
+            allUsers.filter((user) => user.role === RoleTypeObj.Admin).length
           } and agent +${
-            allUsers && allUsers.filter((user) => user.role === RoleTypeObj.Agent).length
+            allUsers &&
+            allUsers.filter((user) => user.role === RoleTypeObj.Agent).length
           }`}
         />
       </div>
-      {
-        credentials?.role === RoleTypeObj.Owner && <CommissionCard commission_value={root_commission}/>
-      }
+      {credentials?.role === RoleTypeObj.Owner && (
+        <CommissionCard commission_value={root_commission} />
+      )}
       <SalesTable
-        users={allUsers ? allUsers.filter((item) => item.role !== "Dev") : []}
+        users={
+          allUsers
+            ? allUsers.filter(
+                (item) => item.role !== "Dev" && item.role !== RoleTypeObj.Owner
+              )
+            : []
+        }
         sales={allSales!}
       />
     </div>

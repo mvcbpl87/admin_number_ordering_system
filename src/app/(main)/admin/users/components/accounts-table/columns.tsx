@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { UserAccountColumnType } from "@/lib/types";
+import { RoleTypeObj, UserAccountColumnType } from "@/lib/types";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -65,7 +65,11 @@ export const columns: ColumnDef<UserAccountColumnType, any>[] = [
     header: "Tier",
     cell: ({ row }) => (
       <div>
-        <Badge variant="secondary">Tier-{Number(row.getValue("tier"))}</Badge>
+        <Badge variant="secondary">
+          {row.original.role === RoleTypeObj.Admin
+            ? `none`
+            : `Tier-${row.getValue("tier")}`}
+        </Badge>
       </div>
     ),
   },
@@ -92,7 +96,7 @@ function ActionDropdown({
 
   const handleClick = async () => {
     try {
-      await DeleteUserAccountAction(user_id)
+      await DeleteUserAccountAction(user_id);
     } catch (error) {
       toast({
         variant: "destructive",
