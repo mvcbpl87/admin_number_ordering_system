@@ -8,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -22,37 +21,45 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-// import { DeleteSubAccountAction } from "@/server-actions";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { useModal } from "@/components/provider/modal-provider";
 import { CustomModal } from "@/components/shared/custom-modal";
 import { ManageUserAccountForm } from "@/components/form/manage-user-account";
 import { DeleteUserAccountAction } from "@/server-actions";
-// import { ManageSubAccountForm } from "@/components/form/manage-subaccount-form";
 
 export const columns: ColumnDef<UserAccountColumnType, any>[] = [
   {
     accessorKey: "id",
-    header: "User Id",
+    header: "user id",
     cell: ({ row }) => {
       const id = row.getValue("id") as string;
       return <div>{id.substring(0, 8)}</div>;
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    accessorKey: "username",
+    header: "users",
+    cell: ({ row }) => {
+      const { username, email } = row.original;
+      return (
+        <div className="flex flex-col gap-2 items-center text-start">
+          <div>{username}</div>
+          <div>{email}</div>
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "username",
-    header: "Username",
-    cell: ({ row }) => <div>{row.getValue("username")}</div>,
+    accessorKey: "commission",
+    header: "comm. rate (%)",
+    cell: ({ row }) => (
+      <div className="text-center">{`${row.original.commission?.percent}%`}</div>
+    ),
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: "role",
     cell: ({ row }) => (
       <div>
         {" "}
@@ -62,7 +69,7 @@ export const columns: ColumnDef<UserAccountColumnType, any>[] = [
   },
   {
     accessorKey: "tier",
-    header: "Tier",
+    header: "tier",
     cell: ({ row }) => (
       <div>
         <Badge variant="secondary">
@@ -112,7 +119,6 @@ function ActionDropdown({
         subheading="Manage agent sub account to update subaccounts credentials"
       >
         <ManageUserAccountForm credentials={data} user_id={user_id} />
-        {/* <ManageSubAccountForm credentials={data} /> */}
       </CustomModal>
     );
   };

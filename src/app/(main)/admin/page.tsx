@@ -110,13 +110,8 @@ export default async function Home() {
         <CommissionCard commission_value={root_commission} />
       )}
       <SalesTable
-        users={
-          allUsers
-            ? allUsers.filter(
-                (item) => item.role !== "Dev" && item.role !== RoleTypeObj.Owner
-              )
-            : []
-        }
+        root_comm={root_commission!}
+        users={allUsers?.filter((user) => user.role === RoleTypeObj.Agent)!}
         sales={allSales!}
       />
     </div>
