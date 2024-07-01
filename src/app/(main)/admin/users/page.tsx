@@ -15,12 +15,21 @@ import {
 } from "@/server-actions";
 import UsersAccountsDataTable from "./components/accounts-table";
 import { columns } from "./components/accounts-table/columns";
+import { RoleTypeObj } from "@/lib/types";
 
 export default async function UserPage() {
   const user = await currentUser();
   const data = await RetrieveAllUsers(user?.id);
   const credentials = await currentUserRoleTier(user?.id);
   const root_commission = await RetrieveRootCommission();
+
+  const AccessDataWPermissions = (role: string) => {
+    if (!data) return [];
+    if (role === RoleTypeObj.Owner)
+      return data?.filter((item) => item.role !== "Dev");
+    return data.filter((item) => item.role === RoleTypeObj.Agent);
+  };
+
   return (
     <main className="flex flex-col flex-1 flex-grow gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
       <Card>
@@ -34,12 +43,11 @@ export default async function UserPage() {
           <CardContent className="p-0">
             <UsersAccountsDataTable
               columns={columns}
-              data={data?.filter((item) => item.role !== "Dev")!}
+              data={AccessDataWPermissions(credentials?.role!)}
               user_id={user.id}
               role={credentials?.role!}
               tier={credentials?.tier!}
               commRate={root_commission?.percent!}
-
             />
           </CardContent>
         </CardHeader>

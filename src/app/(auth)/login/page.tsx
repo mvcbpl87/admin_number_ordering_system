@@ -6,7 +6,11 @@ const _constant = {
   alt: "background-image",
   size: "flex flex-grow h-screen w-full",
 };
-export default function LoginForm() {
+export default function LoginForm({
+  searchParams,
+}: {
+  searchParams: { message: string };
+}) {
   return (
     <div className="min-h-screen  flex items-center relative">
       <Image
@@ -16,7 +20,7 @@ export default function LoginForm() {
         className="absolute w-full h-full "
       />
       <div className="absolute w-full h-full bg-black/30 " />
-      <UserAuthForm className="z-[100]"/>
+      <UserAuthForm searchParams={searchParams} className="z-[100]" />
     </div>
   );
 }

@@ -6,11 +6,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function startOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 2).toISOString();
+  return new Date(date.getFullYear(), date.getMonth(), 1);
 }
-
 export function endOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 1).toISOString();
+  return new Date(date.getFullYear(), date.getMonth() + 1, 1);
 }
 
 // Format Date into standard prefixes
@@ -31,8 +30,8 @@ export const NumberFormater = (value: string) => {
   return value;
 };
 
-export function ISOTimeFormater(date:string){
-  return new Date(date).toISOString().slice(0,10);
+export function ISOTimeFormater(date: string) {
+  return new Date(date).toISOString().slice(0, 10);
 }
 
 export function WeekTimeFrame() {
@@ -47,6 +46,6 @@ export function WeekTimeFrame() {
   return week;
 }
 
-export function DailyTimeFrame(){
+export function DailyTimeFrame() {
   return new Date().toISOString().slice(0, 10);
 }

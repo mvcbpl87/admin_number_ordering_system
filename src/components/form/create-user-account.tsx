@@ -25,26 +25,30 @@ import { useToast } from "../ui/use-toast";
 import {
   CreateUserAccountSchema,
   CreateUserAccountSchemaType,
+  RoleType,
   RoleTypeList,
   RoleTypeObj,
   TierTypeList,
 } from "@/lib/types";
 import { CreateUserAccountAction } from "@/server-actions";
+import { useModal } from "../provider/modal-provider";
 
 interface CreateUserAccountFormProps extends HTMLAttributes<HTMLDivElement> {
   user_id: string;
-  role: string;
-  commRate:number;
+  parent_role: string;
+  commRate: number;
 }
 
 export function CreateUserAccountForm({
   className,
-  role,
+  parent_role,
   user_id,
   commRate,
   ...props
 }: CreateUserAccountFormProps) {
+  const [roleField, setRoleField] = useState<string>("Agent");
   const { toast } = useToast();
+  const { setClose } = useModal();
   const defaultValues: Partial<CreateUserAccountSchemaType> = {
     email: "",
     username: "",
@@ -52,7 +56,7 @@ export function CreateUserAccountForm({
     parent: user_id,
     role: "Agent",
     tier: "1",
-    percent: commRate
+    percent: commRate,
   };
   const form = useForm<CreateUserAccountSchemaType>({
     resolver: zodResolver(CreateUserAccountSchema),
@@ -62,7 +66,7 @@ export function CreateUserAccountForm({
   const isLoading = form.formState.isLoading;
   const onSubmit = async (values: CreateUserAccountSchemaType) => {
     try {
-      await CreateUserAccountAction(values);
+      // await CreateUserAccountAction(values);
       toast({
         variant: "successful",
         title: "Successfully create subaccount",
@@ -74,7 +78,17 @@ export function CreateUserAccountForm({
         title: "Uh oh! Something went wrong.",
         description: `${error}`,
       });
+    } finally {
+      setClose();
     }
+  };
+
+  /* --- Constraint for setting up role -- */
+  const RoleAccessPermission = (current_role: string) => {
+    if (!current_role) return RoleTypeList;
+    if (current_role === RoleTypeObj.Owner)
+      RoleTypeList.filter((role) => role !== RoleTypeObj.Owner);
+    return RoleTypeList.filter((role) => role === RoleTypeObj.Agent);
   };
   return (
     <div className={cn("grid gap-6", className)} {...props}>
@@ -88,7 +102,12 @@ export function CreateUserAccountForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setRoleField(value);
+                      }}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue
@@ -99,13 +118,11 @@ export function CreateUserAccountForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {RoleTypeList.filter((item) => item !== "Owner").map(
-                          (role) => (
-                            <SelectItem value={role} key={`role-${role}`}>
-                              {role}
-                            </SelectItem>
-                          )
-                        )}
+                        {RoleAccessPermission(parent_role).map((role) => (
+                          <SelectItem value={role} key={`role-${role}`}>
+                            {role}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -179,12 +196,14 @@ export function CreateUserAccountForm({
                         placeholder="20%"
                         value={field.value}
                         onChange={(e) => {
+                          if (Number(e.target.value) < 0) return;
                           if (!isNaN(Number(e.target.value))) {
                             field.onChange(Number(e.target.value));
                           }
                         }}
                         type="number"
-                        readOnly = {role !== RoleTypeObj.Owner}
+                        readOnly={parent_role !== RoleTypeObj.Owner}
+                        disabled={roleField === RoleTypeObj.Admin}
                       />
                     </FormControl>
                     <FormMessage />

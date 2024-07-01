@@ -202,12 +202,13 @@ export function ManageUserAccountForm({
                       placeholder="20%"
                       value={field.value}
                       onChange={(e) => {
+                        if (Number(e.target.value) < 0) return;
                         if (!isNaN(Number(e.target.value))) {
                           field.onChange(Number(e.target.value));
                         }
                       }}
                       type="number"
-                      readOnly = {credentials.role !== RoleTypeObj.Owner}
+                      readOnly={credentials.role !== RoleTypeObj.Owner}
                       disabled
                     />
                   </FormControl>

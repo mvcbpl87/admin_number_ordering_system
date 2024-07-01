@@ -25,8 +25,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {
+  searchParams: { message: string };
+}
+export function UserAuthForm({
+  className,
+  searchParams,
+  ...props
+}: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<UserAuthSchemaType>({
     resolver: zodResolver(UserAuthSchema),
@@ -39,16 +45,24 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   async function onSubmit(data: UserAuthSchemaType) {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await LoginAction(data);
     } catch (err) {
       console.log("Error from login form", err);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   }
   return (
-    <div className={cn("mx-auto max-w-sm", className)} {...props}>
+    <div
+      className={cn("mx-auto max-w-sm space-y-[1rem]", className)}
+      {...props}
+    >
+      {searchParams?.message && (
+        <div className="p-4 flex flex-col items-center bg-destructive text-background">
+          {searchParams.message}
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Admin login</CardTitle>
@@ -69,7 +83,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="m@example.com"
+                            placeholder="admin@email.com"
                             {...field}
                             required
                           />

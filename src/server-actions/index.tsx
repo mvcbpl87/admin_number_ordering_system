@@ -128,8 +128,8 @@ export async function RetrieveAllSales() {
     const { error, data } = await supabase
       .from("customer_orders")
       .select("*, ticket_numbers(*)")
-      .gte("created_at", startOfMonth(currDate))
-      .lte("created_at", endOfMonth(currDate));
+      .gte("created_at", formatDate(startOfMonth(currDate)))
+      .lte("created_at", formatDate(endOfMonth(currDate)));
     if (error) throw new Error(error.message);
     return data;
   } catch (err) {
@@ -383,14 +383,14 @@ export async function UpsertUserCommission(user_id: string, percent: number) {
 }
 
 export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
-  let temp : WinningOrders= {
+  let temp: WinningOrders = {
     customer_id: values.customer_id,
     prize_id: values.prize_id,
     number: values.number,
     draw_date: values.draw_date,
     gametype: values.gametype,
     category: values.category,
-    claimed : !values.claimed
+    claimed: !values.claimed,
   };
   try {
     const supabase = createClient();
@@ -400,8 +400,8 @@ export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
       .select(
         "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
       );
-      if (error) throw new Error(error.message);
-      return data;
+    if (error) throw new Error(error.message);
+    return data;
   } catch (err) {
     console.log(err);
   }

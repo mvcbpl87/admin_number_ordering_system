@@ -55,7 +55,7 @@ export default function UsersAccountsDataTable<TData, TValue>({
         <Separator className="my-10 " />
         <CreateUserAccountForm
           user_id={user_id}
-          role={role}
+          parent_role={role}
           commRate={commRate}
           className="pt-2"
         />
@@ -73,7 +73,7 @@ export default function UsersAccountsDataTable<TData, TValue>({
     <div className="flex flex-col flex-grow flex-1 ">
       <div className="flex items-center justify-between py-4 ">
         <Input
-          placeholder="Search user accounts..."
+          placeholder="Search user username..."
           value={
             (table.getColumn("username")?.getFilterValue() as string) ?? ""
           }
