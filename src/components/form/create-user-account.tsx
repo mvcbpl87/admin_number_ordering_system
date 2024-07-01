@@ -66,7 +66,7 @@ export function CreateUserAccountForm({
   const isLoading = form.formState.isLoading;
   const onSubmit = async (values: CreateUserAccountSchemaType) => {
     try {
-      // await CreateUserAccountAction(values);
+      await CreateUserAccountAction(values);
       toast({
         variant: "successful",
         title: "Successfully create subaccount",
