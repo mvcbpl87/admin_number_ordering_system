@@ -15,12 +15,7 @@ declare global {
 
   /* ----- Custom Type Exports ----- */
   type UsersWCommission = Users & { commission: Commission | null };
-  type WinningNumbersWPrize = {
-    id: WinningNumbers["id"];
-    number: WinningNumbers["number"];
-    gametype: WinningNumbers["gametype"];
-    draw_date: WinningNumbers["draw_date"];
-    category: WinningNumbers["category"];
+  type WinningNumbersWPrize = WinningNumbers & {
     prizes: Prizes;
   };
   type WinningOrdersWCredentials = WinningOrders & {

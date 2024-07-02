@@ -30,14 +30,6 @@ import { DeleteUserAccountAction } from "@/server-actions";
 
 export const columns: ColumnDef<UserAccountColumnType, any>[] = [
   {
-    accessorKey: "id",
-    header: "user id",
-    cell: ({ row }) => {
-      const id = row.getValue("id") as string;
-      return <div>{id.substring(0, 8)}</div>;
-    },
-  },
-  {
     accessorKey: "username",
     header: "users",
     cell: ({ row }) => {
@@ -53,9 +45,12 @@ export const columns: ColumnDef<UserAccountColumnType, any>[] = [
   {
     accessorKey: "commission",
     header: "comm. rate (%)",
-    cell: ({ row }) => (
-      <div className="text-center">{`${row.original.commission?.percent}%`}</div>
-    ),
+    cell: ({ row }) => {
+      const { commission, role } = row.original;
+      if (role === RoleTypeObj.Admin)
+        return <div className="text-center">none</div>;
+      return <div className="text-center">{`${commission?.percent}%`}</div>;
+    },
   },
   {
     accessorKey: "role",
@@ -74,7 +69,7 @@ export const columns: ColumnDef<UserAccountColumnType, any>[] = [
       <div>
         <Badge variant="secondary">
           {row.original.role === RoleTypeObj.Admin
-            ? `none`
+            ? `${row.getValue("tier")}`
             : `Tier-${row.getValue("tier")}`}
         </Badge>
       </div>
@@ -115,8 +110,8 @@ function ActionDropdown({
   const handleEdit = () => {
     modal.setOpen(
       <CustomModal
-        title="Manage Sub Account"
-        subheading="Manage agent sub account to update subaccounts credentials"
+        title="Manage user account"
+        subheading="Manage user account to update user credentials."
       >
         <ManageUserAccountForm credentials={data} user_id={user_id} />
       </CustomModal>

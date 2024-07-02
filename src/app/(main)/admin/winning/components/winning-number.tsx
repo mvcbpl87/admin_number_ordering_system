@@ -68,8 +68,7 @@ export default function WinningNumber({
         gametype,
         formatDate(drawDate)
       );
-
-      if (winning_number) setItems(winning_number);
+      setItems((prev) => (prev = winning_number ? winning_number : []));
     } catch (error) {
       toast({
         variant: "destructive",
@@ -124,6 +123,7 @@ export default function WinningNumber({
       });
     }
   };
+
   const handleSave = async () => {
     if (!category || !gametype || !drawDate) return;
     try {
@@ -135,10 +135,14 @@ export default function WinningNumber({
         category: item.category,
         prize_id: item.prizes.id,
         draw_date: item.draw_date,
-        created_at: item.draw_date,
+        created_at: item.created_at,
       }));
+
+      /* ---- Critical Server Actions for Winning Numbers ---- */
       await UpdateWinningNumbers(params);
       await DeleteWinningOrders(formatDate(drawDate));
+      /* ---------- End Region for Winning Numbers ----------- */
+
       setWinningNumbers((prev) => (prev = items));
       toast({
         variant: "successful",

@@ -110,7 +110,7 @@ export default function WinningTable({
               <TableHead>contacts</TableHead>
               <TableHead>agent</TableHead>
               <TableHead>prize type</TableHead>
-              <TableHead>status</TableHead>
+              <TableHead>hq_status</TableHead>
               <TableHead className="text-end">prize winning</TableHead>
               <TableHead className="sr-only table-cell">Action</TableHead>
             </TableRow>
@@ -141,7 +141,9 @@ export default function WinningTable({
                     </div>
                   </TableCell>
                   <TableCell>{data.prizes?.prize_type}</TableCell>
-                  <TableCell>{data.claimed ? "claimed" : "pending"}</TableCell>
+                  <TableCell>
+                    {data.claimed ? "received" : "not received"}
+                  </TableCell>
                   <TableCell className="text-end font-medium">
                     RM{" "}
                     {data.prizes?.prize_value &&
@@ -174,9 +176,14 @@ function ActionDropdown({
   setData: React.Dispatch<React.SetStateAction<WinningOrdersWCredentials[]>>;
 }) {
   const { toast } = useToast();
+  const [isDeposited, setIsDeposited] = useState(false);
+
   const handleClaim = async () => {
     try {
-      const update_data = await UpsertWinningClaim(data);
+      var temp = data;
+      temp.claimed = isDeposited;
+
+      const update_data = await UpsertWinningClaim(temp);
       if (update_data)
         setData((prev) => {
           var exisitingItems = [...prev];
@@ -207,8 +214,29 @@ function ActionDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem>
-            <AlertDialogTrigger>Claim</AlertDialogTrigger>
+          <DropdownMenuItem className="p-0">
+            <AlertDialogTrigger asChild>
+              <Button
+                variant={"ghost"}
+                size={"sm"}
+                className="flex py-2 w-full"
+                onClick={() => setIsDeposited(true)}
+              >
+                <span className="text-start w-full">Deposited</span>
+              </Button>
+            </AlertDialogTrigger>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="p-0">
+            <AlertDialogTrigger asChild>
+              <Button
+                variant={"ghost"}
+                size={"sm"}
+                className="flex py-2 w-full"
+                onClick={() => setIsDeposited(false)}
+              >
+                <span className="text-start w-full">Not deposited</span>
+              </Button>
+            </AlertDialogTrigger>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

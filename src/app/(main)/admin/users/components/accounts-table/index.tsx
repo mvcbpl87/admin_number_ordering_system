@@ -41,7 +41,6 @@ export default function UsersAccountsDataTable<TData, TValue>({
   data,
   user_id,
   role,
-  tier,
   commRate,
 }: DataTableProps<TData, TValue>) {
   const modal = useModal();
@@ -75,10 +74,10 @@ export default function UsersAccountsDataTable<TData, TValue>({
         <Input
           placeholder="Search user username..."
           value={
-            (table.getColumn("id")?.getFilterValue() as string) ?? ""
+            (table.getColumn("username")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("id")?.setFilterValue(event.target.value)
+            table.getColumn("username")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

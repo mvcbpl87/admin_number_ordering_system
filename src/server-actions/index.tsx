@@ -5,6 +5,7 @@ import path from "@/lib/path";
 import {
   CreateUserAccountSchemaType,
   ManageUserAccountSchemaType,
+  RoleTypeObj,
   SoldOutNumberSchemaType,
   UserAuthSchemaType,
 } from "@/lib/types";
@@ -12,6 +13,7 @@ import { createSupabaseAdmin } from "@/supabase/client";
 import { revalidatePath } from "next/cache";
 import { getUniquePermutation } from "@/lib/game-utils/permutation";
 import { formatDate, startOfMonth, endOfMonth } from "@/lib/utils";
+import { DatePreset } from "@/lib/game-utils/draw-date-generator";
 
 /* --- Authentication user action ---  */
 export async function currentUser() {
@@ -208,9 +210,15 @@ export async function RetrieveWinningNumbers(
     const { data, error } = await supabase
       .from("winning_numbers")
       .select("*, prizes(*)")
-      .match({ category, gametype, draw_date });
+      .eq("category", category)
+      .eq("gametype", gametype)
+      .eq("draw_date", draw_date);
     if (error) throw new Error(error.message);
+
     if (data.length === 0) {
+      const presetDrawDates = new DatePreset().GET_DRAW_DATE();
+      if (!presetDrawDates.includes(draw_date)) return;
+
       const initParams = await InitWinningNumbers(
         category,
         gametype,
@@ -238,7 +246,7 @@ export async function RetrieveWinningOrders(
   draw_date: string
 ) {
   try {
-    let temp = [];
+    let temp: WinningOrders[] = [];
     const supabase = createClient();
 
     /* 1) Display exisiting winning order for particular draw_date */
@@ -266,7 +274,7 @@ export async function RetrieveWinningOrders(
           .overlaps("number", won_num.number);
 
         if (error) throw new Error(error.message);
-        const sortOrder = data.map((order) => ({
+        const sortOrder: WinningOrders[] = data.map((order) => ({
           customer_id: order.customer_orders[0].id,
           prize_id: won_num.prizes.id,
           number: won_num.number.filter((number) =>
@@ -275,6 +283,7 @@ export async function RetrieveWinningOrders(
           gametype,
           draw_date: won_num.draw_date,
           category: won_num.category,
+          claimed: false,
         }));
         temp.push(...sortOrder);
       }
@@ -325,12 +334,12 @@ export async function CreateWinningNumbers(values: any) {
 }
 
 /** Create winning orders (Bulk or single) */
-export async function CreateWinningOrders(values: any) {
+export async function CreateWinningOrders(values: WinningOrders[]) {
   try {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("winning_orders")
-      .upsert(values)
+      .insert(values)
       .select(
         "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
       );
@@ -345,6 +354,8 @@ export async function CreateUserAccountAction(
   values: CreateUserAccountSchemaType
 ) {
   try {
+    const isAdmin = values.role === RoleTypeObj.Admin;
+
     const supabase = createSupabaseAdmin();
     const { data, error } = await (
       await supabase
@@ -357,11 +368,12 @@ export async function CreateUserAccountAction(
         email: values.email,
         role: values.role,
         parent: values.parent,
-        tier: `${Number(values.tier)}`,
+        tier: isAdmin ? "none" : `${Number(values.tier)}`,
       },
     });
     if (error) throw new Error(error.message);
-    if (data) await UpsertUserCommission(data.user.id, values.percent);
+    if (data && !isAdmin)
+      await UpsertUserCommission(data.user.id, values.percent);
 
     return revalidatePath(path.users);
   } catch (err) {
@@ -390,7 +402,7 @@ export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
     draw_date: values.draw_date,
     gametype: values.gametype,
     category: values.category,
-    claimed: !values.claimed,
+    claimed: values.claimed,
   };
   try {
     const supabase = createClient();
@@ -508,7 +520,7 @@ export async function UpdateCurrentUserAccountAction(
 ) {
   try {
     const supabase = createSupabaseAdmin();
-    const { data, error } = await (
+    const { error } = await (
       await supabase
     ).auth.updateUser({
       email: values.email,
@@ -529,7 +541,7 @@ export async function UpdateCurrentUserAccountAction(
 }
 
 /* Update Winning Number */
-export async function UpdateWinningNumbers(values: Partial<WinningNumbers>[]) {
+export async function UpdateWinningNumbers(values: WinningNumbers[]) {
   try {
     const supabase = createClient();
     const { data, error } = await supabase

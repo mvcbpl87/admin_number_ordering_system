@@ -25,7 +25,6 @@ import { useToast } from "../ui/use-toast";
 import {
   CreateUserAccountSchema,
   CreateUserAccountSchemaType,
-  RoleType,
   RoleTypeList,
   RoleTypeObj,
   TierTypeList,
@@ -87,7 +86,7 @@ export function CreateUserAccountForm({
   const RoleAccessPermission = (current_role: string) => {
     if (!current_role) return RoleTypeList;
     if (current_role === RoleTypeObj.Owner)
-      RoleTypeList.filter((role) => role !== RoleTypeObj.Owner);
+      return RoleTypeList.filter((role) => role !== RoleTypeObj.Owner);
     return RoleTypeList.filter((role) => role === RoleTypeObj.Agent);
   };
   return (
