@@ -41,14 +41,16 @@ export default function SalesTable({
 }: SalesTableProps) {
   const calculateAllTotalSales = (data: UsersWCommission[]) => {
     let total: number[] = [];
-
+    let tier_1_comm: number = 0;
+    
     data.forEach((user) => {
       const eq_commission = (tier: string, value: number) => {
+        console.log(tier, value);
         if (Number(tier) > 1)
-          return (
-            ((root_comm.percent - user.commission?.percent!) / 100) * value
-          );
-        return (user.commission?.percent! / 100) * value;
+          return ((tier_1_comm - user.commission?.percent!) / 100) * value;
+
+        tier_1_comm = user.commission?.percent!;
+        return (tier_1_comm / 100) * value;
       };
       const salesByUser = sales.filter((item) => item.user_id === user.id);
       const totalEaUser = salesByUser.reduce((accumulator, current) => {
@@ -62,6 +64,9 @@ export default function SalesTable({
     });
     return total.reduce((sum, num) => (sum += num), 0);
   };
+
+
+
   const calculateTotalSales = (user_id: string) => {
     var totalSales = 0;
     const salesByUser = sales.filter((item) => item.user_id === user_id);
@@ -161,7 +166,7 @@ export default function SalesTable({
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
-                            RM { calculateAllTotalSales(tree_node).toFixed(2)}
+                            RM {calculateAllTotalSales(tree_node).toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right">
                             RM{calculateTotalSales(root_user.id).toFixed(2)}
