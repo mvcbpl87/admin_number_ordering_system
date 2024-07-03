@@ -9,7 +9,9 @@ import {
   IconEyeDollar
 } from "@tabler/icons-react";
 
-type NavLinksType = "Dashboard" | "Users" | "Sales" |"SoldOut" | "Winnings" | "Settings";
+type NavLinksType = "Dashboard" | "Users" | "Sales" 
+// |"SoldOut"
+ | "Winnings" | "Settings";
 
 type NavLinksElement = {
   id: string;
@@ -74,7 +76,7 @@ export const NavLinksElements: NavLinksElementsType = {
   Dashboard,
   Sales,
   Users,
-  SoldOut,
+  // SoldOut,
   Winnings,
   Settings,
 };
@@ -83,7 +85,7 @@ export const NavLinksList: NavLinksType[] = [
   "Dashboard",
   "Sales",
   "Users",
-  "SoldOut",
+  // "SoldOut",
   "Winnings",
   "Settings",
 ];
