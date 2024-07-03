@@ -26,12 +26,21 @@ import { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { RoleTypeObj } from "@/lib/types";
+import { calculateCommission } from "@/lib/admin/commission";
 
 interface SalesTableProps extends HTMLAttributes<HTMLDivElement> {
   users: UsersWCommission[] | [];
   sales: AllSales[] | [];
   root_comm: RootCommission;
 }
+
+type Agent = {
+  id: string;
+  parent_id: string;
+  tier: string;
+  commissionRate: number;
+  downline: any[];
+};
 
 export default function SalesTable({
   className,
@@ -42,10 +51,9 @@ export default function SalesTable({
   const calculateAllTotalSales = (data: UsersWCommission[]) => {
     let total: number[] = [];
     let tier_1_comm: number = 0;
-    
+
     data.forEach((user) => {
       const eq_commission = (tier: string, value: number) => {
-        console.log(tier, value);
         if (Number(tier) > 1)
           return ((tier_1_comm - user.commission?.percent!) / 100) * value;
 
@@ -64,8 +72,6 @@ export default function SalesTable({
     });
     return total.reduce((sum, num) => (sum += num), 0);
   };
-
-
 
   const calculateTotalSales = (user_id: string) => {
     var totalSales = 0;
@@ -104,6 +110,71 @@ export default function SalesTable({
     }
     return global.length !== 0 ? global : [];
   };
+
+  const AgentTree = (users: UsersWCommission[], tier: string = "1") => {
+    const global: Agent[] = [];
+    const AgentConstruct = (user: UsersWCommission): Agent => {
+      return {
+        id: user.id,
+        parent_id: user.refer_to!,
+        tier: user.tier,
+        commissionRate: user.commission?.percent! / 100,
+        downline: [],
+      };
+    };
+    const hasChild = (parent_id: string) => {
+      return users.filter((item) => item.refer_to === parent_id);
+    };
+
+    const TierUsers = users.filter((item) => item.tier === tier);
+
+    for (let tierUser of TierUsers) {
+      let flat: Agent[] = [];
+      const stack: UsersWCommission[] = [tierUser];
+
+      while (stack.length > 0) {
+        const curr = stack.shift();
+
+        if (!curr) return;
+        flat.push(AgentConstruct(curr));
+
+        const { id } = curr;
+        // const checkParent = flat.find((parent) => parent.id === refer_to);
+        // if (checkParent) {
+        //   const index = flat.findIndex((parent) => parent.id === refer_to);
+        //   flat[index]["downline"].push(AgentConstruct(curr));
+        // }
+        if (hasChild(id).length > 0)
+          hasChild(id).forEach((child) => {
+            stack.unshift(child);
+          });
+      }
+      global.push(...flat);
+    }
+    return global.length === 0 ? [] : global;
+  };
+
+  const TestFunction = (data: Agent[] | undefined) => {
+    if (!data) return;
+    const idMapping = data.reduce((acc: { [key: string]: number }, el, i) => {
+      acc[el.id] = i;
+      return acc;
+    }, {});
+
+    data.forEach((el) => {
+      const parentEl = data[idMapping[el.parent_id]];
+      if (parentEl) {
+        parentEl.downline = [...(parentEl.downline || []), el];
+      }
+    });
+
+    return data;
+  };
+
+  const test = TestFunction(AgentTree(users));
+  const testCalculation =
+    test && test.map((user) => calculateCommission(user, sales));
+  console.log(testCalculation);
   return (
     <Card className={cn("xl:col-span-2", className)}>
       <CardHeader className="flex flex-row items-center">
@@ -113,6 +184,12 @@ export default function SalesTable({
             <span>Recent sales made by agent for this month! </span>
             <IconConfetti size={15} />
           </CardDescription>
+          <div>
+            <Badge>
+              Total Sales&nbsp;
+              RM{testCalculation?.reduce((sum, item) => sum + item, 0).toFixed(2)}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -166,7 +243,12 @@ export default function SalesTable({
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
-                            RM {calculateAllTotalSales(tree_node).toFixed(2)}
+                            RM{" "}
+                            {test &&
+                              calculateCommission(
+                                test.find((user) => user.id === root_user.id)!,
+                                sales
+                              ).toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right">
                             RM{calculateTotalSales(root_user.id).toFixed(2)}
@@ -181,6 +263,9 @@ export default function SalesTable({
                                 (item) => item.id !== root_user.id
                               )}
                               calculateTotalSales={calculateTotalSales}
+                              agent_tree={test!}
+                              sales={sales}
+                              calculateCommission={calculateCommission}
                             />
                           </>
                         </CollapsibleContent>
@@ -200,10 +285,22 @@ export default function SalesTable({
 interface DownlineSalesTableProps {
   users: UsersWCommission[] | [];
   calculateTotalSales: (user_id: string) => number;
+
+  /** WIP (will refactor) */
+  agent_tree: Agent[];
+  sales: AllSales[];
+  calculateCommission: (
+    agent: Agent,
+    sales: AllSales[],
+    baseCommission?: number
+  ) => number;
 }
 function DownlineSalesTable({
   users,
   calculateTotalSales,
+  agent_tree,
+  sales,
+  calculateCommission,
 }: DownlineSalesTableProps) {
   return (
     <>
@@ -245,12 +342,17 @@ function DownlineSalesTable({
             </TableCell>
             <TableCell className="text-center">
               RM
-              {user.commission
+              {/* {user.commission
                 ? (
                     (calculateTotalSales(user.id) * user.commission?.percent!) /
                     100
                   ).toFixed(2)
-                : 0}
+                : 0} */}
+              {agent_tree &&
+                calculateCommission(
+                  agent_tree.find((curr) => curr.id === user.id)!,
+                  sales
+                ).toFixed(2)}
             </TableCell>
             <TableCell className="text-right">
               RM{calculateTotalSales(user.id).toFixed(2)}
