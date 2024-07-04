@@ -6,12 +6,17 @@ import {
   IconUsers,
   IconTrophyFilled,
   IconNumber,
-  IconEyeDollar
+  IconEyeDollar,
+  IconReport,
 } from "@tabler/icons-react";
 
-type NavLinksType = "Dashboard" | "Users" | "Sales" 
-// |"SoldOut"
- | "Winnings" | "Settings";
+type NavLinksType =
+  | "Dashboard"
+  | "Users"
+  | "Sales"
+  | "Report"
+  | "Winnings"
+  | "Settings";
 
 type NavLinksElement = {
   id: string;
@@ -49,6 +54,14 @@ const SoldOut = {
   icon: IconNumber,
 };
 
+const Report = {
+  id: "nav-report",
+  type: "Report",
+  label: "Report",
+  href: path.report,
+  icon: IconReport,
+};
+
 const Winnings = {
   id: "side-winning",
   type: "Winning",
@@ -71,12 +84,12 @@ const Sales = {
   label: "Sales",
   href: path.sales,
   icon: IconEyeDollar,
-}
+};
 export const NavLinksElements: NavLinksElementsType = {
   Dashboard,
   Sales,
   Users,
-  // SoldOut,
+  Report,
   Winnings,
   Settings,
 };
@@ -85,7 +98,7 @@ export const NavLinksList: NavLinksType[] = [
   "Dashboard",
   "Sales",
   "Users",
-  // "SoldOut",
+  "Report",
   "Winnings",
   "Settings",
 ];

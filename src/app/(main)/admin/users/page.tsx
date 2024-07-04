@@ -34,7 +34,7 @@ export default async function UserPage() {
     <main className="flex flex-col flex-1 flex-grow gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
       <Card>
         <CardHeader>
-          <div className="mx-auto grid w-full max-w-6xl gap-2">
+          <div className="grid w-full max-w-6xl gap-2">
             <h1 className="text-3xl font-semibold">Manage Users</h1>
             <p className="text-muted-foreground">
               Control user&apos;s access activities.
