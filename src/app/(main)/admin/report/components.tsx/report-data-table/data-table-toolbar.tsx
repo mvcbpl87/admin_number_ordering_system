@@ -14,10 +14,10 @@ export function DataTableToolbar<TData>({
         <Input
           placeholder="Search sales by draw date..."
           value={
-            (table.getColumn("order_id")?.getFilterValue() as string) ?? ""
+            (table.getColumn("draw_date")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("order_id")?.setFilterValue(event.target.value)
+            table.getColumn("draw_date")?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />

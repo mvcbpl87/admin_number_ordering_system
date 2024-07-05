@@ -18,12 +18,15 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { Loader2 } from "lucide-react";
+import { ReportColumnType } from "@/lib/types";
+import { FilterGametype } from "../report-hooks/hooks";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -129,8 +132,39 @@ export function DataTableReport<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+          <CustomTableFooter data={data as ReportColumnType[]} />
         </Table>
       </div>
     </div>
+  );
+}
+
+type TableFooterProps = {
+  data: ReportColumnType[];
+};
+function CustomTableFooter({ data }: TableFooterProps) {
+  let TotalBig = 0;
+  let TotalSmall = 0;
+  let TotalSum = 0;
+
+  const CalculateSum = (gametype: string) => {
+    return data.reduce((acc, item) => {
+      const pivot = gametype === "Big" ? item.total_big : item.total_small;
+      return (acc += pivot);
+    }, 0);
+  };
+  TotalBig = CalculateSum("Big");
+  TotalSmall = CalculateSum("Small");
+  TotalSum = TotalBig + TotalSmall;
+  return (
+    <TableFooter>
+      <TableRow className=" h-[3.5rem]">
+        <TableCell className="text-end ">{null}</TableCell>
+        <TableCell className="text-center ">RM{TotalBig.toFixed(2)}</TableCell>
+        <TableCell className="text-center">RM{TotalSmall.toFixed(2)}</TableCell>
+        <TableCell className="text-center">RM{TotalSum.toFixed(2)}</TableCell>
+        <TableCell className="sr-only">action</TableCell>
+      </TableRow>
+    </TableFooter>
   );
 }

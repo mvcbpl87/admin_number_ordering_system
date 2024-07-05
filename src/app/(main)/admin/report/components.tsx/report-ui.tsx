@@ -22,6 +22,7 @@ import { DateRange } from "react-day-picker";
 import { addDays } from "date-fns";
 import { DataTableReport } from "./report-data-table/data-table-report";
 import { columns } from "./report-data-table/columns";
+import FetchSalesByRange from "./report-hooks/fetch-sales-by-range";
 
 export default function ReportUI() {
   const currDate = new Date();
@@ -29,6 +30,10 @@ export default function ReportUI() {
   const [date, setDate] = useState<DateRange | undefined>({
     from: currDate,
     to: addDays(currDate, 7),
+  });
+  const { sales } = FetchSalesByRange({
+    date,
+    category: currCategory,
   });
 
   return (
@@ -70,11 +75,10 @@ export default function ReportUI() {
             <CardDescription className="flex items-center gap-2">
               <span>Report for sales made by agent! </span>
             </CardDescription>
-            <div></div>
           </div>
         </CardHeader>
         <CardContent>
-          <DataTableReport columns={columns} data={[]} isLoading={false} />
+          <DataTableReport columns={columns} data={sales} isLoading={false} />
         </CardContent>
       </Card>
     </div>

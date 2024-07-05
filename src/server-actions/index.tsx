@@ -155,6 +155,23 @@ export async function RetrieveTargetSales(category: string, draw_date: string) {
   }
 }
 
+/* --- Read Target Sales for selected certain range draw_date --- */
+export async function RetrieveSalesOnRange(value: string) {
+  try {
+    //prettier-ignore
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("customer_orders")
+      .select(`*, ticket_numbers!inner(*)`)
+      .filter("ticket_numbers.draw_date", "in", value);
+
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 /* --- Read all prizes type --- */
 export async function RetrievePrizes() {
   try {
