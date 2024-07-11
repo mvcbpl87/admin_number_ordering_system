@@ -1,12 +1,11 @@
 "use client";
-
 import { useToast } from "@/components/ui/use-toast";
 import { RetrieveSalesOnRange } from "@/server-actions";
 import { DateRange } from "react-day-picker";
-import React from "react";
+import React, { useState } from "react";
 import { formatDate } from "@/lib/utils";
 import { addDays } from "date-fns";
-import { FilterGametype, TotalSales } from "./hooks";
+import { FilterCategory, FilterGametype, TotalSales } from "./hooks";
 
 type ReportType = {
   draw_date: string;
@@ -15,16 +14,18 @@ type ReportType = {
   total_sales: number;
 };
 
-interface FetchSalesByRangeProps {
-  date: DateRange | undefined;
-  category: string;
-}
-export default function FetchSalesByRange({
-  date,
-  category,
-}: FetchSalesByRangeProps) {
+interface FetchSalesByRangeProps {}
+
+export default function FetchSalesByRange() {
+  const today = new Date();
+  const [category, setCategory] = React.useState<string>("all");
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: today,
+    to: addDays(today, 7),
+  });
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [sales, setSales] = React.useState<ReportType[]>([]);
+  // const [salesReport, setSalesReport] = React.useState<ReportType[]>([]);
+  const [sales, setSales] = React.useState<AllSales[]>([]);
   const { toast } = useToast();
 
   const dateDiffInDays = (from: Date, to: Date) => {
@@ -98,10 +99,7 @@ export default function FetchSalesByRange({
         const allDrawDates = FilterDateConstructs(maxRange, { from, to });
         const data = await RetrieveSalesOnRange(allDrawDates);
 
-        if (data) {
-          const result = ReduceSalesByDrawDates(data);
-          setSales(result);
-        }
+        if (data) setSales(data);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -113,6 +111,17 @@ export default function FetchSalesByRange({
       }
     };
     if (date) fetchRequest();
-  }, [date, category]);
-  return { sales, isLoading };
+  }, [date]);
+
+  const salesReport = ReduceSalesByDrawDates(FilterCategory(sales, category));
+
+  return {
+    sales,
+    salesReport,
+    isLoading,
+    category,
+    setCategory,
+    date,
+    setDate,
+  };
 }

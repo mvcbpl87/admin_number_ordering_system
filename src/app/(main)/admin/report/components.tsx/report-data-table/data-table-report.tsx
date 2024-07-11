@@ -32,12 +32,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isLoading: boolean;
+  selectCell: (target: ReportColumnType) => void;
 }
 
 export function DataTableReport<TData, TValue>({
   columns,
   data,
   isLoading,
+  selectCell,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -112,7 +114,12 @@ export function DataTableReport<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      onClick={() =>
+                        selectCell(cell.row.original as ReportColumnType)
+                      }
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

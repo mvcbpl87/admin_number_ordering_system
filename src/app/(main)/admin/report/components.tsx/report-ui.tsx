@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { CategoryList } from "@/lib/types";
+import { CategoryList, ReportColumnType } from "@/lib/types";
 import {
   Select,
   SelectContent,
@@ -18,35 +18,44 @@ import {
 } from "@/components/ui/card";
 import { IconImage } from "@/components/shared/IconImgTemplate";
 import { DatePickerWithRange } from "./date-picker-range";
-import { DateRange } from "react-day-picker";
-import { addDays } from "date-fns";
 import { DataTableReport } from "./report-data-table/data-table-report";
 import { columns } from "./report-data-table/columns";
 import FetchSalesByRange from "./report-hooks/fetch-sales-by-range";
+import ReportSheetModal from "./report-sheet-modal";
 
-export default function ReportUI() {
-  const currDate = new Date();
-  const [currCategory, setCurrCategory] = useState<string>("all");
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: currDate,
-    to: addDays(currDate, 7),
-  });
-  const { sales } = FetchSalesByRange({
+interface ReportUIProps {
+  users: UsersWCommission[];
+}
+
+export default function ReportUI({ users }: ReportUIProps) {
+  const [currentCell, setCurrentCell] = useState<string | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+  const {
+    sales,
+    salesReport,
+    isLoading,
+    category,
+    setCategory,
     date,
-    category: currCategory,
-  });
+    setDate,
+  } = FetchSalesByRange();
+
+  const selectCell = (target: ReportColumnType) => {
+    setCurrentCell(target.draw_date);
+    setOpen(!open);
+  };
 
   return (
     <div className="flex flex-col flex-grow space-y-[1rem]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* --- Set Shop Category --- */}
-          <Select onValueChange={setCurrCategory} defaultValue={currCategory}>
+          <Select onValueChange={setCategory} defaultValue={category}>
             <SelectTrigger className="w-[200px] bg-background">
               <SelectValue placeholder="Select shop category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={"all"} onClick={() => setCurrCategory("all")}>
+              <SelectItem value={"all"} onClick={() => setCategory("all")}>
                 <span className="flex items-center justify-center gap-2 py-2 text-center">
                   All Categories
                 </span>
@@ -55,7 +64,7 @@ export default function ReportUI() {
                 <SelectItem
                   value={category.name}
                   key={category.name}
-                  onClick={() => setCurrCategory(category.name)}
+                  onClick={() => setCategory(category.name)}
                 >
                   <div className="flex items-center gap-2 py-2">
                     <IconImage src={category.src} alt={category.alt} />
@@ -68,6 +77,7 @@ export default function ReportUI() {
           <DatePickerWithRange date={date} setDate={setDate} />
         </div>
       </div>
+
       <Card>
         <CardHeader>
           <div className="grid gap-2">
@@ -78,9 +88,24 @@ export default function ReportUI() {
           </div>
         </CardHeader>
         <CardContent>
-          <DataTableReport columns={columns} data={sales} isLoading={false} />
+          <DataTableReport
+            columns={columns}
+            selectCell={selectCell}
+            data={salesReport}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
+      {currentCell && (
+        <ReportSheetModal
+          isOpen={open}
+          setOpen={setOpen}
+          users={users}
+          category={category}
+          sales={sales}
+          current_draw={currentCell}
+        />
+      )}
     </div>
   );
 }

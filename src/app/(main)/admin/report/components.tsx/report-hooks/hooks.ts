@@ -2,7 +2,18 @@
  * Hooks for Report UI to correlated with each and follows the correct flows during
  * filtering allSales
  */
-
+export const FilterDrawDateAndUserId = (
+  sales: AllSales[],
+  user_id: string,
+  draw_date: string
+): AllSales[] => {
+  return sales.filter(
+    (item) =>
+      item.ticket_numbers &&
+      item.ticket_numbers.draw_date === draw_date &&
+      item.user_id === user_id
+  );
+};
 export const FilterCategory = (
   sales: AllSales[],
   category: string
