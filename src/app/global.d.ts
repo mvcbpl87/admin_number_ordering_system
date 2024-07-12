@@ -23,6 +23,7 @@ declare global {
       id: CustomerOrders["id"];
       phone_number: CustomerOrders["phone_number"];
       users: {
+        id: Users["id"];
         username: Users["username"];
         email: Users["email"];
       } | null;

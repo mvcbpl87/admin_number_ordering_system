@@ -270,7 +270,7 @@ export async function RetrieveWinningOrders(
     const { data, error } = await supabase
       .from("winning_orders")
       .select(
-        "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
+        "*, customer_orders(id, phone_number, users(id, username, email)), prizes(prize_type, prize_value) "
       )
       .eq("draw_date", draw_date)
       .eq("gametype", gametype)
@@ -358,7 +358,7 @@ export async function CreateWinningOrders(values: WinningOrders[]) {
       .from("winning_orders")
       .insert(values)
       .select(
-        "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
+        "*, customer_orders(id, phone_number, users(id, username, email)), prizes(prize_type, prize_value) "
       );
     if (error) throw new Error(error.message);
     return data;
@@ -427,7 +427,7 @@ export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
       .from("winning_orders")
       .upsert(temp)
       .select(
-        "*, customer_orders(id, phone_number, users(username, email)), prizes(prize_type, prize_value) "
+        "*, customer_orders(id, phone_number, users(id, username, email)), prizes(prize_type, prize_value) "
       );
     if (error) throw new Error(error.message);
     return data;

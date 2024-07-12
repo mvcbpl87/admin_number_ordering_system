@@ -177,3 +177,12 @@ export const CategoryList: CategoryListType[] = [
     tag: "sport_toto",
   },
 ];
+
+export type ReduceWinningOrderType = {
+  id: string;
+  username: string;
+  email: string;
+  total_payout: number;
+  total_claimed: number;
+  data: WinningOrdersWCredentials[];
+};

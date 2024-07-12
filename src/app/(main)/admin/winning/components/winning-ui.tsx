@@ -12,8 +12,12 @@ import {
 import { DatePicker } from "@/components/shared/DatePicker";
 import { IconImage } from "@/components/shared/IconImgTemplate";
 import WinningNumber from "./winning-number";
+import WinningOrderSection from "./winning-order-section";
 
-export default function WinningUI() {
+interface WinningUIProps {
+  users: UsersWCommission[];
+}
+export default function WinningUI({ users }: WinningUIProps) {
   const [winningNumbers, setWinningNumbers] = useState<WinningNumbersWPrize[]>(
     []
   );
@@ -72,11 +76,18 @@ export default function WinningUI() {
         gametype={gametype}
         drawDate={date}
       />
-      <WinningTable
+      {/* <WinningTable
         winning_number={winningNumbers}
         category={currCategory}
         gametype={gametype}
         drawDate={date}
+      /> */}
+      <WinningOrderSection
+        users={users}
+        category={currCategory}
+        draw_date={date}
+        gametype={gametype}
+        winning_number={winningNumbers}
       />
     </div>
   );
