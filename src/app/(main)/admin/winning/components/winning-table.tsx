@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { RetrieveWinningOrders, UpsertWinningClaim } from "@/server-actions";
+import { RetrieveWinningOrders, UpsertWinningPayout } from "@/server-actions";
 import { formatDate } from "@/lib/utils";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 
@@ -182,16 +182,16 @@ function ActionDropdown({
       var temp = data;
       temp.claimed = isDeposited;
 
-      const update_data = await UpsertWinningClaim(temp);
+      const update_data = await UpsertWinningPayout(temp);
       if (update_data)
         setData((prev) => {
           var exisitingItems = [...prev];
           var ItemIndex = exisitingItems.findIndex(
             (currItem) =>
-              currItem.customer_id === update_data[0].customer_id &&
-              currItem.prize_id === update_data[0].prize_id
+              currItem.customer_id === update_data.customer_id &&
+              currItem.prize_id === update_data.prize_id
           );
-          exisitingItems[ItemIndex] = update_data[0];
+          exisitingItems[ItemIndex] = update_data;
           return exisitingItems;
         });
     } catch (error) {

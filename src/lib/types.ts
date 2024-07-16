@@ -182,7 +182,8 @@ export type ReduceWinningOrderType = {
   id: string;
   username: string;
   email: string;
-  total_payout: number;
+  total_deposited: number;
+  total_sales:number;
   total_claimed: number;
   data: WinningOrdersWCredentials[];
 };

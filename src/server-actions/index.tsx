@@ -301,6 +301,7 @@ export async function RetrieveWinningOrders(
           draw_date: won_num.draw_date,
           category: won_num.category,
           claimed: false,
+          deposited:false,
         }));
         temp.push(...sortOrder);
       }
@@ -411,7 +412,7 @@ export async function UpsertUserCommission(user_id: string, percent: number) {
   }
 }
 
-export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
+export async function UpsertWinningPayout(values: WinningOrdersWCredentials) {
   let temp: WinningOrders = {
     customer_id: values.customer_id,
     prize_id: values.prize_id,
@@ -420,6 +421,7 @@ export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
     gametype: values.gametype,
     category: values.category,
     claimed: values.claimed,
+    deposited:values.deposited
   };
   try {
     const supabase = createClient();
@@ -428,7 +430,7 @@ export async function UpsertWinningClaim(values: WinningOrdersWCredentials) {
       .upsert(temp)
       .select(
         "*, customer_orders(id, phone_number, users(id, username, email)), prizes(prize_type, prize_value) "
-      );
+      ).single();
     if (error) throw new Error(error.message);
     return data;
   } catch (err) {
