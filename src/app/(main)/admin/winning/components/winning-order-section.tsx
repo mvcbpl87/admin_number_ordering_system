@@ -49,7 +49,7 @@ interface WinnerSectionProps {
   gametype: string | null;
   draw_date: Date | undefined;
   winning_number: WinningNumbersWPrize[];
-  users: UsersWCommission[];
+  users: UsersWCommissionCredits[];
 }
 export default function WinningOrderSection({
   category,
@@ -378,7 +378,7 @@ function ActionDropdown({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you wish to continue claim this ticket?
+            Are you wish to continue to deposit this ticket?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

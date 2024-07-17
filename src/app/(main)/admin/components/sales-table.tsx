@@ -29,7 +29,7 @@ import { RoleTypeObj } from "@/lib/types";
 import { calculateCommission } from "@/lib/admin/commission";
 
 interface SalesTableProps extends HTMLAttributes<HTMLDivElement> {
-  users: UsersWCommission[] | [];
+  users: UsersWCommissionCredits[] | [];
   sales: AllSales[] | [];
   root_comm: RootCommission;
 }
@@ -48,7 +48,7 @@ export default function SalesTable({
   sales,
   root_comm,
 }: SalesTableProps) {
-  const calculateAllTotalSales = (data: UsersWCommission[]) => {
+  const calculateAllTotalSales = (data: UsersWCommissionCredits[]) => {
     let total: number[] = [];
     let tier_1_comm: number = 0;
 
@@ -87,16 +87,16 @@ export default function SalesTable({
     return totalSales;
   };
 
-  const dfs = (data: UsersWCommission[]) => {
-    let global: UsersWCommission[][] = [];
+  const dfs = (data: UsersWCommissionCredits[]) => {
+    let global: UsersWCommissionCredits[][] = [];
     const testTier1 = data.filter((item) => item.tier === "1");
     const hasChild = (parent_id: string) => {
       return data.filter((item) => item.refer_to === parent_id);
     };
 
     for (let metaTier1 of testTier1) {
-      const flat: UsersWCommission[] = [];
-      const stack: UsersWCommission[] = [metaTier1];
+      const flat: UsersWCommissionCredits[] = [];
+      const stack: UsersWCommissionCredits[] = [metaTier1];
       while (stack.length > 0) {
         const cur = stack.shift();
         if (cur) {
@@ -111,9 +111,9 @@ export default function SalesTable({
     return global.length !== 0 ? global : [];
   };
 
-  const AgentTree = (users: UsersWCommission[], tier: string = "1") => {
+  const AgentTree = (users: UsersWCommissionCredits[], tier: string = "1") => {
     const global: Agent[] = [];
-    const AgentConstruct = (user: UsersWCommission): Agent => {
+    const AgentConstruct = (user: UsersWCommissionCredits): Agent => {
       return {
         id: user.id,
         parent_id: user.refer_to!,
@@ -130,7 +130,7 @@ export default function SalesTable({
 
     for (let tierUser of TierUsers) {
       let flat: Agent[] = [];
-      const stack: UsersWCommission[] = [tierUser];
+      const stack: UsersWCommissionCredits[] = [tierUser];
 
       while (stack.length > 0) {
         const curr = stack.shift();
@@ -283,7 +283,7 @@ export default function SalesTable({
 }
 
 interface DownlineSalesTableProps {
-  users: UsersWCommission[] | [];
+  users: UsersWCommissionCredits[] | [];
   calculateTotalSales: (user_id: string) => number;
 
   /** WIP (will refactor) */

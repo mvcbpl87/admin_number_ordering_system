@@ -24,7 +24,7 @@ interface ReportSheetModalProps {
   isOpen: boolean;
   category: string;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  users: UsersWCommission[];
+  users: UsersWCommissionCredits[];
   sales: AllSales[];
   current_draw: string;
 }

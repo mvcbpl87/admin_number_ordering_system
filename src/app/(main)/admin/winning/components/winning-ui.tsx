@@ -15,7 +15,7 @@ import WinningNumber from "./winning-number";
 import WinningOrderSection from "./winning-order-section";
 
 interface WinningUIProps {
-  users: UsersWCommission[];
+  users: UsersWCommissionCredits[];
 }
 export default function WinningUI({ users }: WinningUIProps) {
   const [winningNumbers, setWinningNumbers] = useState<WinningNumbersWPrize[]>(

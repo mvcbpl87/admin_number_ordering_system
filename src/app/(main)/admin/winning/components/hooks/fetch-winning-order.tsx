@@ -9,7 +9,7 @@ interface FetchWinningOrderProps {
   gametype: string | null;
   draw_date: Date | undefined;
   winning_number: WinningNumbersWPrize[];
-  users: UsersWCommission[];
+  users: UsersWCommissionCredits[];
 }
 
 export default function FetchWinningOrder({

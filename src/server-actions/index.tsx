@@ -14,6 +14,7 @@ import { revalidatePath } from "next/cache";
 import { getUniquePermutation } from "@/lib/game-utils/permutation";
 import { formatDate, startOfMonth, endOfMonth } from "@/lib/utils";
 import { DatePreset } from "@/lib/game-utils/draw-date-generator";
+import { error } from "console";
 
 /* --- Authentication user action ---  */
 export async function currentUser() {
@@ -96,7 +97,7 @@ export async function RetrieveAllUsers(user_id: string) {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("users")
-      .select("*, commission(*)")
+      .select("*, commission(*), credits(*)")
       .neq("id", user_id);
     if (error) throw new Error(error.message);
 
@@ -301,7 +302,7 @@ export async function RetrieveWinningOrders(
           draw_date: won_num.draw_date,
           category: won_num.category,
           claimed: false,
-          deposited:false,
+          deposited: false,
         }));
         temp.push(...sortOrder);
       }
@@ -372,6 +373,7 @@ export async function CreateUserAccountAction(
   values: CreateUserAccountSchemaType
 ) {
   try {
+    const _default_credits = 500;
     const isAdmin = values.role === RoleTypeObj.Admin;
 
     const supabase = createSupabaseAdmin();
@@ -390,8 +392,10 @@ export async function CreateUserAccountAction(
       },
     });
     if (error) throw new Error(error.message);
-    if (data && !isAdmin)
+    if (data && !isAdmin) {
       await UpsertUserCommission(data.user.id, values.percent);
+      await UpsertUserCredits(data.user.id, _default_credits);
+    }
 
     return revalidatePath(path.users);
   } catch (err) {
@@ -412,6 +416,20 @@ export async function UpsertUserCommission(user_id: string, percent: number) {
   }
 }
 
+export async function UpsertUserCredits(user_id: string, credit_value: number) {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("credits")
+      .upsert({ id: user_id, credit_value })
+      .select();
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 export async function UpsertWinningPayout(values: WinningOrdersWCredentials) {
   let temp: WinningOrders = {
     customer_id: values.customer_id,
@@ -421,7 +439,7 @@ export async function UpsertWinningPayout(values: WinningOrdersWCredentials) {
     gametype: values.gametype,
     category: values.category,
     claimed: values.claimed,
-    deposited:values.deposited
+    deposited: values.deposited,
   };
   try {
     const supabase = createClient();
@@ -430,7 +448,8 @@ export async function UpsertWinningPayout(values: WinningOrdersWCredentials) {
       .upsert(temp)
       .select(
         "*, customer_orders(id, phone_number, users(id, username, email)), prizes(prize_type, prize_value) "
-      ).single();
+      )
+      .single();
     if (error) throw new Error(error.message);
     return data;
   } catch (err) {

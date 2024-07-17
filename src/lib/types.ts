@@ -61,6 +61,10 @@ export const BuyNumberSchema = z.object({
   total_small: z.number().min(1, { message: "Required amount to buy small" }),
 });
 
+export const CreditTopupSchema = z.object({
+  user_id: z.string().min(1),
+  credit_value: z.number().min(1, { message: "Required credit value" }),
+});
 export const UserProfileSchema = z.object({
   username: z
     .string()
@@ -96,6 +100,7 @@ export type ManageUserAccountSchemaType = z.infer<
 >;
 export type SoldOutNumberSchemaType = z.infer<typeof SoldOutNumberSchema>;
 export type BuyNumberSchemaType = z.infer<typeof BuyNumberSchema>;
+export type CreditTopupSchemaType = z.infer<typeof CreditTopupSchema>;
 export type TierType = "1" | "2" | "3";
 export type RoleType = "Owner" | "Admin" | "Agent";
 type RoleTypeObjType = {
@@ -123,7 +128,7 @@ export type ReportColumnType = {
   total_sales: number;
 };
 
-export type UserAccountColumnType = UsersWCommission;
+export type UserAccountColumnType = UsersWCommissionCredits;
 
 export type shopType =
   | "Damacai"
@@ -183,7 +188,7 @@ export type ReduceWinningOrderType = {
   username: string;
   email: string;
   total_deposited: number;
-  total_sales:number;
+  total_sales: number;
   total_claimed: number;
   data: WinningOrdersWCredentials[];
 };

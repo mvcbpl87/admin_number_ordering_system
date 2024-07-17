@@ -27,6 +27,7 @@ import { useModal } from "@/components/provider/modal-provider";
 import { CustomModal } from "@/components/shared/custom-modal";
 import { ManageUserAccountForm } from "@/components/form/manage-user-account";
 import { DeleteUserAccountAction } from "@/server-actions";
+import CreditTopupForm from "@/components/form/credits-topup-form";
 
 export const columns: ColumnDef<UserAccountColumnType, any>[] = [
   {
@@ -76,6 +77,23 @@ export const columns: ColumnDef<UserAccountColumnType, any>[] = [
     ),
   },
   {
+    id: "credits",
+    accessorFn: (item) => item.credits?.credit_value,
+    header: "credits",
+    cell: ({ row }) => {
+      const { credits } = row.original;
+      return (
+        <div>
+          {credits ? (
+            `RM${credits.credit_value.toFixed(2)}`
+          ) : (
+            <Badge variant={"secondary"}>none</Badge>
+          )}
+        </div>
+      );
+    },
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
@@ -117,6 +135,28 @@ function ActionDropdown({
       </CustomModal>
     );
   };
+
+  const handleTopUp = () => {
+    if (!data.credits) {
+      toast({
+        title: "Reminder",
+        description: `Unable to top up credit for this user`,
+      });
+      return;
+    }
+    modal.setOpen(
+      <CustomModal
+        title="Topup credits"
+        subheading="Topup agent credits with certain amount."
+      >
+        <CreditTopupForm
+          user_id={user_id}
+          credit_value={data.credits?.credit_value!}
+          className="pt-2"
+        />
+      </CustomModal>
+    );
+  };
   return (
     <AlertDialog>
       <DropdownMenu>
@@ -131,6 +171,9 @@ function ActionDropdown({
           <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
           <DropdownMenuItem>
             <AlertDialogTrigger>Delete</AlertDialogTrigger>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleTopUp}>
+            Topup credits
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

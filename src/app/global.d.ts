@@ -12,9 +12,13 @@ declare global {
   type TicketBought = Database["public"]["Tables"]["ticket_bought"]["Row"];
   type Commission = Database["public"]["Tables"]["commission"]["Row"];
   type RootCommission = Database["public"]["Tables"]["root_commission"]["Row"];
+  type Credits = Database["public"]["Tables"]["credits"]['Row'];
 
   /* ----- Custom Type Exports ----- */
-  type UsersWCommission = Users & { commission: Commission | null };
+  type UsersWCommissionCredits = Users & {
+    commission: Commission | null;
+    credits: Credits | null;
+  };
   type WinningNumbersWPrize = WinningNumbers & {
     prizes: Prizes;
   };

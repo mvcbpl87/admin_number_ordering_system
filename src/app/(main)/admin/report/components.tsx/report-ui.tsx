@@ -24,7 +24,7 @@ import FetchSalesByRange from "./report-hooks/fetch-sales-by-range";
 import ReportSheetModal from "./report-sheet-modal";
 
 interface ReportUIProps {
-  users: UsersWCommission[];
+  users: UsersWCommissionCredits[];
 }
 
 export default function ReportUI({ users }: ReportUIProps) {
